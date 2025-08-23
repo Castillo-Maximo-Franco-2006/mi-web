@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Libros</title>
+    <style>
+        /* Estilos CSS para la visualización */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #catalogo-libros {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .libro-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Para empujar las observaciones al final */
+        }
+        .libro-card:hover {
+            transform: translateY(-5px);
+        }
+        .libro-card h2 {
+            font-size: 1.4em;
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .libro-card p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+        .libro-card strong {
+            color: #555;
+        }
+        .libro-card .observaciones {
+            font-style: italic;
+            color: #666;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Dos columnas para la información */
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .info-grid p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Catálogo de Libros de la Biblioteca</h1>
+
+    <div id="catalogo-libros">
+        <p id="loading-message">Cargando libros...</p>
+    </div>
+
+    <script>
+        // Script JavaScript para cargar y mostrar los datos del JSON
+        document.addEventListener('DOMContentLoaded', () => {
+            const catalogoDiv = document.getElementById('catalogo-libros');
+            const loadingMessage = document.getElementById('loading-message');
+
+            fetch('libros.json') // Asegúrate de que 'libros.json' esté en la misma carpeta
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error al cargar el JSON: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(libros => {
+                    loadingMessage.style.display = 'none'; // Ocultar mensaje de carga
+                    if (libros.length === 0) {
+                        catalogoDiv.innerHTML = '<p>No se encontraron libros en el catálogo.</p>';
+                        return;
+                    }
+
+                    libros.forEach(libro => {
+                        const card = document.createElement('div');
+                        card.classList.add('libro-card');
+
+                        card.innerHTML = `
+                            <h2>${libro.titulo || 'Sin Título'}</h2>
+                            <p><strong>Autor/es:</strong> ${libro.autores || 'Desconocido'}</p>
+                            <div class="info-grid">
+                                <p><strong>Editorial:</strong> ${libro.editorial || 'Desconocida'}</p>
+                                <p><strong>Lugar Edición:</strong> ${libro.lugar_edicion || 'Desconocido'}</p>
+                                <p><strong>Año y Pág.:</strong> ${libro.anio_pag || 'N/A'}</p>
+                                <p><strong>Inventario:</strong> ${libro.inventario || 'N/A'}</p>
+                                <p><strong>Ejemplar:</strong> ${libro.ejemplar || 'N/A'}</p>
+                                <p><strong>Fecha:</strong> ${libro.fecha || 'N/A'}</p>
+                            </div>
+                            ${libro.observaciones ? `<p class="observaciones"><strong>Obs.:</strong> ${libro.observaciones}</p>` : ''}
+                        `;
+                        catalogoDiv.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    loadingMessage.textContent = `Error al cargar los libros: ${error.message}. Asegúrate de que 'libros.json' existe y tiene el formato correcto.`;
+                    loadingMessage.style.color = 'red';
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>

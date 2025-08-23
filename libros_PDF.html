@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca PDF</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #pdfList { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
+    .pdf-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      width: 150px;
+      text-align: center;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+    .pdf-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .pdf-card button {
+      padding: 5px 10px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .pdf-card button:hover { background-color: #0056b3; }
+    input[type="file"] { display: none; }
+    .custom-file-upload {
+      display: inline-block;
+      padding: 10px 15px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Subir PDF</h2>
+<label for="pdfInput" class="custom-file-upload">Seleccionar PDF</label>
+<input type="file" id="pdfInput" accept="application/pdf">
+<div id="pdfList"></div>
+
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+<script>
+  const pdfInput = document.getElementById('pdfInput');
+  const pdfList = document.getElementById('pdfList');
+
+  pdfInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const pdfData = new Uint8Array(e.target.result);
+
+      // Cargar el PDF con PDF.js
+      pdfjsLib.getDocument({data: pdfData}).promise.then(pdf => {
+        pdf.getPage(1).then(page => {
+          const viewport = page.getViewport({scale: 1});
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          // Renderizar página en canvas
+          page.render({canvasContext: context, viewport: viewport}).promise.then(() => {
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL(); // Convertir canvas en imagen
+
+            const card = document.createElement('div');
+            card.className = 'pdf-card';
+
+            card.appendChild(img);
+
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = 'Descargar';
+            downloadBtn.onclick = () => {
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(file);
+              link.download = file.name;
+              link.click();
+            };
+            card.appendChild(downloadBtn);
+
+            pdfList.appendChild(card);
+          });
+        });
+      });
+    }
+    reader.readAsArrayBuffer(file);
+  });
+</script>
+
+</body>
+</html>

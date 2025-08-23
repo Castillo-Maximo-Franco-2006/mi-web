@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fichas guardadas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .ficha {
+            border: 2px solid #333;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+        }
+        .ficha h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fichas de préstamo guardadas</h1>
+    <div id="contenedorFichas"></div>
+
+    <script>
+        const contenedor = document.getElementById('contenedorFichas');
+        const fichas = JSON.parse(localStorage.getItem("fichas_retiro")) || [];
+
+        if (fichas.length === 0) {
+            contenedor.innerHTML = "<p>No hay fichas guardadas.</p>";
+        } else {
+            fichas.forEach((ficha, i) => {
+                const div = document.createElement('div');
+                div.className = 'ficha';
+
+                div.innerHTML = `
+                    <h3>Ficha #${i + 1}</h3>
+                    <p><strong>Fecha:</strong> ${ficha.fecha}</p>
+                    <p><strong>Alumno:</strong> ${ficha.alumno["APELLIDO Y NOMBRES"]} - DNI: ${ficha.alumno["N° DE DNI"]}</p>
+                    <p><strong>Curso:</strong> ${ficha.alumno.CURSO} - Turno: ${ficha.alumno.TURNO}</p>
+                    <p><strong>Domicilio:</strong> ${ficha.alumno.DOMICILIO}</p>
+                    <hr>
+                    <p><strong>Libro:</strong> ${ficha.libro.titulo}</p>
+                    <p><strong>Autor:</strong> ${ficha.libro.autor}</p>
+                    <p><strong>Editorial:</strong> ${ficha.libro.editorial}</p>
+                    <p><strong>Materia:</strong> ${ficha.libro.materia}</p>
+                    <p><strong>Inventario:</strong> ${ficha.libro.inventario}</p>
+                `;
+                contenedor.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>

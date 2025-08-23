@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Alumnos</title>
+</head>
+<body>
+    <h2>Registrar Alumno</h2>
+    <form id="formAlumno">
+        <input type="text" placeholder="Apellido" id="apellido" required><br>
+        <input type="text" placeholder="Nombre" id="nombre" required><br>
+        <input type="text" placeholder="Curso" id="curso" required><br>
+        <input type="text" placeholder="Turno" id="turno" required><br>
+        <input type="text" placeholder="DNI" id="dni" required><br>
+        <input type="text" placeholder="Legajo (opcional)" id="legajo"><br>
+        <button type="submit">Guardar Alumno</button>
+    </form>
+
+    <script>
+        document.getElementById('formAlumno').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const alumno = {
+                apellido: document.getElementById('apellido').value,
+                nombre: document.getElementById('nombre').value,
+                curso: document.getElementById('curso').value,
+                turno: document.getElementById('turno').value,
+                dni: document.getElementById('dni').value,
+                legajo: document.getElementById('legajo').value
+            };
+
+            localStorage.setItem(`alumno_${alumno.dni}`, JSON.stringify(alumno));
+            alert("Alumno registrado con éxito");
+            this.reset();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-xkjdruerF7AOthyu45T_bETa97x6_pg",
+        authDomain: "farmacia-web-d0d71.firebaseapp.com",
+        projectId: "farmacia-web-d0d71",
+        storageBucket: "farmacia-web-d0d71.firebasestorage.app",
+        messagingSenderId: "580153875699",
+        appId: "1:580153875699:web:aa53b21ba70a5bc7396b86"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    </script>
+
+
+
+
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biblioteca_Digital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            width: 100%;
+            background-color: #0e0955;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 7%;
+            z-index: 1000;
+        }
+        .navbar img {
+            height: 98px;
+            width: 63px;
+            margin-top: -22px;
+            margin-right: 90%;
+        }
+        .container {
+            margin-top: 12%;
+            margin-left: 26%;
+        }
+        #barraInput_libro, #barraInput_alumno {
+            border-radius: 30px;
+            border: 1px solid #707070;
+            height: 50px;
+            margin-top: 3%;
+            padding-left: 15px;
+            font-size: 16px;
+        }
+        #barraInput_libro {
+            width: 38%;
+            margin-left: 3%;
+            margin-top: 10px;
+        }
+        #barraInput_alumno {
+            width: 45%;
+            margin-left: 48%;
+            margin-top: -54px;
+        }
+        .ficha_libro {
+            width: 40%;
+            margin-left: 3%;
+            margin-top: 25px;
+            height: 370px;
+            border: 3px solid #000000;
+            background-color: #ffffff;
+        }
+        .ficha_alumno {
+            width: 48%;
+            margin-left: 48%;
+            height: 370px;
+            border: 3px solid #000000;
+            background-color: #ffffff;
+            margin-top: -377px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px 20px;
+            padding: 20px;
+            margin-top: 18px;
+            box-sizing: border-box;
+        }
+        .form-grid.libro {
+            grid-template-columns: 1fr;
+            margin-top: -5px;
+        }
+        .campo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .campo span {
+            width: 100px;
+            font-weight: bold;
+        }
+        .campo input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #guardarFichaBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            margin-left: 40%;
+            margin-top: 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #guardarFichaBtn:hover {
+            background-color: #45a049;
+        }
+
+
+        .campo input,
+        .campo select {
+            width: 65%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <img src="imagenes/escudo_11.png" alt="Escudo" />
+    </div>
+
+    <div class="container">
+        <h1 style="font-size: 30px; color: #000; text-align: center; margin-top: -70px; margin-right: 300px;">Prestar material</h1>
+    </div>
+
+    <input type="text" id="barraInput_libro" placeholder="Buscar libro...">
+    <input type="text" id="barraInput_alumno" placeholder="Buscar alumno por DNI...">
+
+    <div class="ficha_libro">
+        <div class="form-grid libro">
+            <div class="campo"><span>Título:</span><input type="text" id="libroTitulo" /></div>
+            <div class="campo"><span>Autor:</span><input type="text" id="libroAutor" /></div>
+            <div class="campo"><span>Editorial:</span><input type="text" id="libroEditorial" /></div>
+            <div class="campo"><span>Materia:</span><input type="text" id="libroMateria" /></div>
+            <div class="campo"><span>N° Inv:</span><input type="text" id="libroInventario" /></div>
+            <div class="campo"><span>Cantidad:</span><input type="text" id="libroCantidad" /></div>
+
+        </div>
+    </div>
+
+    <div class="ficha_alumno">
+    <div class="form-grid">
+        <div class="campo"><span>Apellido:</span><input type="text" id="alumnoApellido" /></div>
+        <div class="campo"><span>Nombre:</span><input type="text" id="alumnoNombre" /></div>
+        <div class="campo"><span>Legajo:</span><input type="text" id="alumnoLegajo" /></div>
+
+        <div class="campo">
+            <span>Curso:</span>
+            <select id="alumnoCurso">
+                <option value="">Seleccionar curso</option>
+                <option>1°</option>
+                <option>2°</option>
+                <option>3°</option>
+                <option>4°</option>
+                <option>5°</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <span>Turno:</span>
+            <select id="alumnoTurno">
+                <option value="">Seleccionar turno</option>
+                <option>Mañana</option>
+                <option>Tarde</option>
+                <option>Vespertino</option>
+            </select>
+        </div>
+
+        <div class="campo"><span>DNI:</span><input type="text" id="alumnoDNI" /></div>
+        <div class="campo"><span>Domicilio:</span><input type="text" id="alumnoDomicilio" /></div>
+    </div>
+
+    <button id="guardarFichaBtn">Guardar ficha</button>
+
+
+<script>
+    // --- FUNCIONES para alumnos almacenados localmente ---
+    function obtenerAlumnos() {
+        const data = localStorage.getItem('alumnosRegistrados');
+        return data ? JSON.parse(data) : [];
+    }
+
+    function guardarAlumnos(alumnos) {
+        localStorage.setItem('alumnosRegistrados', JSON.stringify(alumnos));
+    }
+
+    // Autocompletar alumno por DNI buscando en localStorage
+    const barraInputAlumno = document.getElementById('barraInput_alumno');
+    const camposAlumno = document.querySelectorAll('.ficha_alumno input');
+
+    barraInputAlumno.addEventListener('input', () => {
+        const dni = barraInputAlumno.value.trim();
+        if (!dni) {
+            camposAlumno.forEach(input => input.value = "");
+            return;
+        }
+
+        const alumnos = obtenerAlumnos();
+        const alumno = alumnos.find(a => a["N° DE DNI"] === dni);
+
+        if (alumno) {
+            // Si el nombre viene como "Apellido, Nombre" lo separamos
+            let apellido = "";
+            let nombre = "";
+            if(alumno["APELLIDO Y NOMBRES"]) {
+                const partes = alumno["APELLIDO Y NOMBRES"].split(",");
+                apellido = partes[0].trim();
+                nombre = partes[1] ? partes[1].trim() : "";
+            }
+            camposAlumno[0].value = apellido;
+            camposAlumno[1].value = nombre;
+            camposAlumno[2].value = alumno["LEGAJO"] || "";
+            camposAlumno[3].value = alumno["CURSO"] || "";
+            camposAlumno[4].value = alumno["TURNO"] || "";
+            camposAlumno[5].value = alumno["N° DE DNI"] || "";
+            camposAlumno[6].value = alumno["DOMICILIO"] || "";
+            camposAlumno[7].value = ""; // Cantidad queda libre
+        } else {
+            camposAlumno.forEach(input => input.value = "");
+            camposAlumno[5].value = dni; // mantenemos el dni ingresado para que no se borre
+        }
+    });
+
+    let libros = [];
+
+    db.collection("libros").get().then(snapshot => {
+    snapshot.forEach(doc => {
+        libros.push(doc.data());
+    });
+    });
+
+
+    const barraLibro = document.getElementById('barraInput_libro');
+    const camposLibro = document.querySelectorAll('.ficha_libro input');
+
+    barraLibro.addEventListener('input', () => {
+        const valor = barraLibro.value.trim();
+
+        const libro = libros.find(l => String(l.inventarioUnico) === valor);
+
+        if (libro) {
+            camposLibro[0].value = libro.titulo || "";
+            camposLibro[1].value = libro.autor || "";
+            camposLibro[2].value = libro.editorial || "";
+            camposLibro[3].value = libro.materia || "";
+            camposLibro[4].value = libro.inventarioUnico || "";
+        } else {
+            camposLibro.forEach(input => input.value = "");
+        }
+    });
+
+    // --- Guardar ficha de préstamo y actualizar alumno localStorage ---
+    document.getElementById("guardarFichaBtn").addEventListener("click", () => {
+        // Datos libro
+        const datosLibro = {
+            titulo: document.getElementById('libroTitulo').value.trim(),
+            autor: document.getElementById('libroAutor').value.trim(),
+            editorial: document.getElementById('libroEditorial').value.trim(),
+            materia: document.getElementById('libroMateria').value.trim(),
+            inventario: document.getElementById('libroInventario').value.trim()
+        };
+
+        // Datos alumno
+        const apellido = document.getElementById('alumnoApellido').value.trim();
+        const nombre = document.getElementById('alumnoNombre').value.trim();
+        const legajo = document.getElementById('alumnoLegajo').value.trim();
+        const curso = document.getElementById('alumnoCurso').value.trim();
+        const turno = document.getElementById('alumnoTurno').value.trim();
+        const dni = document.getElementById('alumnoDNI').value.trim();
+        const domicilio = document.getElementById('alumnoDomicilio').value.trim();
+
+        const apellidosNombres = apellido && nombre ? `${apellido}, ${nombre}` : (apellido || nombre);
+
+        const datosAlumno = {
+            "APELLIDO Y NOMBRES": apellidosNombres,
+            "LEGAJO": legajo,
+            "CURSO": curso,
+            "TURNO": turno,
+            "N° DE DNI": dni,
+            "DOMICILIO": domicilio
+        };
+
+        if (!dni) {
+            alert("Debe ingresar DNI del alumno.");
+            return;
+        }
+        if (!datosLibro.titulo) {
+            alert("Debe ingresar el título del libro.");
+            return;
+        }
+
+        // Actualizar o agregar alumno
+        let alumnos = obtenerAlumnos();
+        const index = alumnos.findIndex(a => a["N° DE DNI"] === dni);
+
+        if (index >= 0) {
+            alumnos[index] = datosAlumno;
+        } else {
+            alumnos.push(datosAlumno);
+        }
+        guardarAlumnos(alumnos);
+
+        // Guardar ficha
+        const ficha = {
+            alumno: datosAlumno,
+            libro: datosLibro,
+            fecha: new Date().toLocaleString()
+        };
+
+        let fichas = JSON.parse(localStorage.getItem("fichas_retiro")) || [];
+        fichas.push(ficha);
+        localStorage.setItem("fichas_retiro", JSON.stringify(fichas));
+
+        alert("Ficha guardada correctamente.");
+
+        // Limpiar campos
+        document.querySelectorAll('.ficha_libro input').forEach(input => input.value = "");
+        document.querySelectorAll('.ficha_alumno input').forEach(input => input.value = "");
+        document.getElementById('barraInput_libro').value = "";
+        document.getElementById('barraInput_alumno').value = "";
+
+        window.location.href = "fichas_retiro.html";
+
+    });
+
+</script>
+
+</body>
+</html>
