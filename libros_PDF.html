@@ -3,103 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca PDF</title>
+  <title>Mi Biblioteca Digital</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #pdfList { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
-    .pdf-card {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      width: 150px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
       text-align: center;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
     }
-    .pdf-card img {
+
+    #biblioteca {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .libro {
+      text-align: center;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 10px;
+      background: white;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .libro:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .libro img {
       width: 100%;
-      height: 200px;
-      object-fit: cover;
-      margin-bottom: 10px;
-    }
-    .pdf-card button {
-      padding: 5px 10px;
-      border: none;
-      background-color: #007bff;
-      color: white;
+      height: auto;
       border-radius: 5px;
-      cursor: pointer;
     }
-    .pdf-card button:hover { background-color: #0056b3; }
-    input[type="file"] { display: none; }
-    .custom-file-upload {
-      display: inline-block;
-      padding: 10px 15px;
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
-      font-size: 14px;
+
+    .libro p {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      word-wrap: break-word;
     }
   </style>
 </head>
 <body>
+  
+  <div id="biblioteca"></div>
 
-<h2>Subir PDF</h2>
-<label for="pdfInput" class="custom-file-upload">Seleccionar PDF</label>
-<input type="file" id="pdfInput" accept="application/pdf">
-<div id="pdfList"></div>
+  <script>
+    const API_KEY = "AIzaSyBeZdXQt50tMf1_by_wYmVhS4bSunfyMBI";
+    const FOLDER_ID = "1XHP57Fx41gX4moIquTG503YvI4r-geQl";
 
-<!-- PDF.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-<script>
-  const pdfInput = document.getElementById('pdfInput');
-  const pdfList = document.getElementById('pdfList');
+    async function cargarLibros() {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,thumbnailLink,webViewLink,mimeType)`;
 
-  pdfInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+      const res = await fetch(url);
+      const data = await res.json();
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const pdfData = new Uint8Array(e.target.result);
+      let contenedor = document.getElementById("biblioteca");
 
-      // Cargar el PDF con PDF.js
-      pdfjsLib.getDocument({data: pdfData}).promise.then(pdf => {
-        pdf.getPage(1).then(page => {
-          const viewport = page.getViewport({scale: 1});
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-
-          // Renderizar página en canvas
-          page.render({canvasContext: context, viewport: viewport}).promise.then(() => {
-            const img = document.createElement('img');
-            img.src = canvas.toDataURL(); // Convertir canvas en imagen
-
-            const card = document.createElement('div');
-            card.className = 'pdf-card';
-
-            card.appendChild(img);
-
-            const downloadBtn = document.createElement('button');
-            downloadBtn.textContent = 'Descargar';
-            downloadBtn.onclick = () => {
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(file);
-              link.download = file.name;
-              link.click();
-            };
-            card.appendChild(downloadBtn);
-
-            pdfList.appendChild(card);
-          });
+      if (data.files && data.files.length > 0) {
+        data.files.forEach(file => {
+          if (file.mimeType === "application/pdf") {
+            let libro = document.createElement("div");
+            libro.className = "libro";
+            libro.innerHTML = `
+              <a href="${file.webViewLink}" target="_blank">
+                <img src="https://drive.google.com/thumbnail?id=${file.id}&sz=w300" alt="${file.name}">
+                <p>${file.name}</p>
+              </a>
+            `;
+            contenedor.appendChild(libro);
+          }
         });
-      });
+      } else {
+        contenedor.innerHTML = "<p>No hay libros en la carpeta todavía.</p>";
+      }
     }
-    reader.readAsArrayBuffer(file);
-  });
-</script>
 
+    window.onload = cargarLibros;
+  </script>
 </body>
 </html>
